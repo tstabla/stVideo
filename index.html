@@ -7,20 +7,30 @@
 
 	<title>stViedo</title>
 
+	<link rel="stylesheet" href="assets/css/stvideo.css">
 
-	<link rel="stylesheet" href="assets/css/style.css">
+	<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 
-	<h1>HTML5 Video and Canvas</h1>
+	<header class="header">
+		<h1 class="header__title">
+			stVideo
+			<small>HTML5 video canvas player</small>
+		</h1>
+
+		<a class="header__logo" href="http://stabla.com"><img src="http://stabla.com/assets/img/stabla-logo-small@2x.png" alt="stabla.com"></a>
+	</header>
+
+	<div class="content">
+		<div id="player" data-stvideo="{'mp4': 'assets/video/car.mp4', 'width': 524, 'height': 270}"></div>
 
 
-	<div id="test" data-stvideo="{'mp4': 'assets/video/car.mp4', 'width': 524, 'height': 270}"></div>
+	</div>
 
-
-	<script src="assets/js/main.js"></script>
+	<script src="assets/js/stvideo.js"></script>
 	<script>
-		var video = new stVideo('#test');
+		var video = new stVideo('#player');
 
 		video.on('canplaythrough', function() {
 			// video.play();

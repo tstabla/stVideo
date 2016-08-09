@@ -1,0 +1,68 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f5f7f7;
+}
+
+.header {
+  text-align: center;
+  margin: 0 auto 16px;
+  width: 100%;
+  max-width: 542px;
+  overflow: hidden;
+  position: relative;
+}
+
+.header:after {
+  content: '';
+  margin: 8px auto 0;
+  display: block;
+  width: 100%;
+  height: 1px;
+  max-width: 348px;
+  background: #1abc9c;
+}
+
+.header__title {
+  font-size: 24px;
+  line-height: 22px;
+  font-family: Georgia,"Nimbus Roman No9 L",serif;
+  font-weight: 600;
+  color: #151d27;
+  margin: 24px 0 0;
+}
+
+.header__title small {
+  font-size: 14px;
+  text-transform: uppercase;
+  display: block;
+}
+
+.header__logo {
+  padding: 12px 0 7px;
+  width: 81px;
+  position: absolute;
+  top: -5px; right: 0;
+  background: #dfe3e4;
+  border-radius: 5px;
+}
+
+.header__logo img {
+  margin: 0 auto;
+  width: 71px;
+  display: block;
+}
+
+.content {
+  margin: 16px auto 0;
+  padding: 5px;
+  max-width: 542px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 4px solid #ecf0f1;
+  border-radius: 5px;
+  box-sizing: border-box;
+}

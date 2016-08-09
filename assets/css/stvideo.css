@@ -65,7 +65,7 @@
   font-size: 24px;
   line-height: 1;
   font-family: stvideo;
-  color: rgb(26,188,156);
+  color: #1bb592;
   margin-left: 2px;
   position: absolute;
   top: 50%; left: 50%;
@@ -75,7 +75,7 @@
 }
 
 .stvideo-box__play:hover:before {
-  color: rgb(22,160,133);
+  color: #179d7e;
 }
 
 .stvideo-box--is-playing .stvideo-box__play {
@@ -89,7 +89,7 @@
   position: absolute;
   bottom: 0; left: 0;
   z-index: 5;
-  background: #2c3e50;
+  background: #253244;
   box-sizing: border-box;
 }
 
@@ -105,11 +105,11 @@
   font-size: 16px;
   line-height: 1;
   font-family: stvideo;
-  color: rgb(26,188,156);
+  color: #1bb592;
 }
 
 .stvideo-box__play-pause:hover:before {
-  color: rgb(22,160,133);
+  color: #179d7e;
 }
 
 .stvideo-box--is-playing .stvideo-box__play-pause:before {
