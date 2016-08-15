@@ -1,20 +1,3 @@
-/*!
-* stVideo
-*
-* Copyright (c) 2016 - Tomasz Stabla | http://www.stabla.com
-*
-* Licensed under the MIT license:
-* http://www.opensource.org/licenses/mit-license.php
-*
-* Any and all use of this script must be accompanied by this copyright/license notice in its present form.
-*
-* Usage: new stVideo('selector');
-*
-* @author: Tomasz Stabla
-* @Version:  0.8
-* @Last update: 08.08.2016
-*/
-
 (function (root, factory) {
     if ( typeof define === 'function' && define.amd ) {
         define([], factory(root));
