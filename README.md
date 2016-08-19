@@ -22,13 +22,26 @@ Or create new object with params, if you not added them to HTML element.
 
 ```javascript
 var video = new stVideo('#player', {
-							'mp4'   : 'filename.mp4',
-							'webm'  : 'filename.webm',
-							'ogg'   : 'filename.ogg',
-							'width' : 524,  //required
-							'height': 270   //required
-						});
+			'mp4'   : 'filename.mp4', //recommended
+			'webm'  : 'filename.webm', //recommended
+			'ogg'   : 'filename.ogg',
+			'width' : 524,  //required
+			'height': 270   //required
+		});
 ```
+
+Look at the table below, and best use .mp4 and .webm video files format.
+
+| &nbsp; | .mp4 | .webm | .ogg |
+| --- | :---: | :---: | :---: |
+| Android | X | &nbsp; | X |
+| iPhone | X | &nbsp; | &nbsp; |
+| Firefox | &nbsp; | X | X |
+| Chrome | &nbsp; | X | X |
+| Safari | X | &nbsp; | &nbsp; |
+| IE >= 9 | X | &nbsp; | &nbsp; |
+| IE Mobile | X | &nbsp; | &nbsp; |
+
 
 At the end, you can play video immediately after initialization.  
 
