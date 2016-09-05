@@ -55,7 +55,13 @@
 
 		this.element = document.querySelector(el);
 
-		this.settings = settings || this.getSettings();
+    this.defaults = {
+      force: 'video'
+    };
+
+    this.settings = this.getSettings(settings);
+
+		// this.settings = settings || this.getSettings();
 
     if(!(this.settings.mp4 || this.settings.webm || this.settings.ogg) ||
       !this.settings.width || !this.settings.height) {
@@ -65,6 +71,12 @@
       this.error.checkSettings();
 
       return;
+    }
+
+    if(this.settings.force === 'video') {
+      this.useCanvas = false;
+    } else if(this.settings.force === 'canvas') {
+      this.useCanvas = true;
     }
 
     this.classNames = {
@@ -87,11 +99,24 @@
 	};
 
 
-	stVideo.prototype.getSettings = function() {
-		var attr = this.element.getAttribute('data-stvideo');
-			  attr = attr.replace(/\'/g, '"');
+	stVideo.prototype.getSettings = function(settings) {
+    var attr, options, key; 
 
-		return JSON.parse(attr);
+    if(!settings) {
+      attr = this.element.getAttribute('data-stvideo');
+      attr = attr.replace(/\'/g, '"');
+      settings = JSON.parse(attr);
+    }
+
+    options = this.defaults;
+
+    for(key in settings) {
+      if(settings.hasOwnProperty(key)) {
+        options[key] = settings[key];
+      }
+    }
+
+		return options;
 	};
 
 
@@ -171,6 +196,11 @@
 	  return extension;
 	};
 
+  stVideo.prototype.supportedVideoFormat = function(video) {
+    return video.mozHasAudio ||
+    Boolean(video.webkitAudioDecodedByteCount) ||
+    Boolean(video.audioTracks && video.audioTracks.length);
+  };
 
   stVideo.prototype.playerControls = function() {
     var poster, controls, timeline, progress, playPause, play, duration;
