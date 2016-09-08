@@ -1,12 +1,14 @@
-(function (root, factory) {
-    if ( typeof define === 'function' && define.amd ) {
-        define([], factory(root));
-    } else if ( typeof exports === 'object' ) {
-        module.exports = factory(root);
-    } else {
-        root.stVideo = factory(root);
-    }
-})(typeof global !== 'undefined' ? global : this.window || this.global, function (root) {
+(function(root, factory) {
+  if(typeof define === 'function' && define.amd) {
+    define([], function() {
+      return factory(root);
+    });
+  } else if(typeof module === "object" && module.exports) {
+    module.exports = factory(root);
+  } else {
+    root.stVideo = factory(root);
+  }
+})(typeof global !== 'undefined' ? global : this.window || this.global, function(root) {
 	'use strict';
 
 	(function(window) {
@@ -43,12 +45,10 @@
 		this.element = document.querySelector(el);
 
     this.defaults = {
-      force: 'video'
+      force: ''
     };
 
     this.settings = this.getSettings(settings);
-
-		// this.settings = settings || this.getSettings();
 
     if(!(this.settings.mp4 || this.settings.webm || this.settings.ogg) ||
       !this.settings.width || !this.settings.height) {
@@ -58,6 +58,7 @@
       this.error.checkSettings();
 
       return;
+
     }
 
     if(this.settings.force === 'video') {
@@ -72,6 +73,8 @@
       isPlaying   : 'stvideo-box--is-playing',
       isPaused    : 'stvideo-box--is-paused',
       isEnded     : 'stvideo-box--is-ended',
+      isMuted     : 'stvideo-box--is-muted',
+      hasAudio    : 'stvideo-box--has-audio',
       player      : 'stvideo-box__player',
       poster      : 'stvideo-box__poster',
       play        : 'stvideo-box__play',
@@ -80,14 +83,19 @@
       timeline    : 'stvideo-box__timeline',
       progress    : 'stvideo-box__progress',
       duration    : 'stvideo-box__duration',
+      volume      : 'stvideo-box__volume',
     };
+
+    this.eventsUserCollection = [];
+    this.eventsVideoCollection = [];
+    this.eventsControlsCollection = [];
 
 		this.initPlayer();
 	};
 
 
 	stVideo.prototype.getSettings = function(settings) {
-    var attr, options, key; 
+    var attr, options, key;
 
     if(!settings) {
       attr = this.element.getAttribute('data-stvideo');
@@ -108,7 +116,7 @@
 
 
 	stVideo.prototype.initPlayer = function() {
-		var ext, wrapper, video, source, type, canvas, context;
+		var format, wrapper, video, videoSource, type, canvas, context;
 
     this.element.classList.add(this.classNames.init);
 
@@ -116,25 +124,19 @@
 		video.setAttribute('width', this.settings.width);
 		video.setAttribute('height', this.settings.height);
 
-		ext = this.supportedVideoFormat(video);
+		format = this.supportedVideoFormat(video);
 
-		if(!ext || (this.useCanvas && !this.settings.mp4) || !this.settings[ext]) {
+		if(!format || (this.useCanvas && !this.settings.mp4) || !this.settings[format.ext]) {
 			this.error.badVideoFormat.call(this);
 
 			return;
-		} else if(ext == 'mp4') {
-			type = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-		} else if(ext == 'webm') {
-			type = 'video/webm; codecs="vp8, vorbis"';
-		} else if(ext == 'ogg') {
-			type = 'video/ogg; codecs="theora, vorbis"';
 		}
 
-		source = document.createElement('source');
-		source.setAttribute('src', this.settings[ext]);
-		source.setAttribute('type', type);
+		videoSource = document.createElement('source');
+		videoSource.setAttribute('src', this.settings[format.ext]);
+		videoSource.setAttribute('type', format.type);
 
-		video.appendChild(source);
+		video.appendChild(videoSource);
 
     wrapper = document.createElement('div');
     wrapper.classList.add(this.classNames.player);
@@ -165,32 +167,60 @@
 		this.video = video;
 
     this.playerControls();
-		this.addEventListeners();
+    this.addVideoListeners();
+    this.addControlsListeners();
 	};
 
 
   stVideo.prototype.supportedVideoFormat = function(video) {
-	  var extension = '';
+	  var options = {};
 
 		if (video.canPlayType('video/webm') == 'probably' || video.canPlayType('video/webm') == 'maybe') {
-			extension = 'webm';
+			options.ext = 'webm';
+      options.type = 'video/webm; codecs="vp8, vorbis"';
 		} else if(video.canPlayType('video/mp4') == 'probably' || video.canPlayType('video/mp4') == 'maybe') {
-			extension = 'mp4';
+			options.ext = 'mp4';
+      options.type = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
 		} else if(video.canPlayType('video/ogg') == 'probably' || video.canPlayType('video/ogg') == 'maybe') {
-			extension = 'ogg';
+			options.ext = 'ogg';
+      options.type = 'video/ogg; codecs="theora, vorbis"';
 		}
 
-	  return extension;
+	  return options;
 	};
 
-  stVideo.prototype.supportedVideoFormat = function(video) {
-    return video.mozHasAudio ||
-    Boolean(video.webkitAudioDecodedByteCount) ||
-    Boolean(video.audioTracks && video.audioTracks.length);
+
+  stVideo.prototype.videoAudio = function(video) {
+    var self = this, tempEvent, volume;
+
+    if(video.mozHasAudio || Boolean(video.webkitAudioDecodedByteCount) || Boolean(video.audioTracks && video.audioTracks.length)) {
+      this.hasAudio = true;
+
+      this.element.classList.add(this.classNames.hasAudio);
+
+      volume = document.createElement('div');
+      volume.classList.add(this.classNames.volume);
+
+      this.elControls.appendChild(volume);
+
+      this.elVolume = volume;
+
+      this.elVolume.addEventListener('click', tempEvent = function() {
+        if(self.isMuted) {
+          self.video.volume = 1;
+        } else {
+          self.video.volume = 0;
+        }
+  		});
+      this.eventsControlsCollection.push(tempEvent);
+    } else {
+      this.hasAudio = false;
+    }
   };
 
+
   stVideo.prototype.playerControls = function() {
-    var poster, controls, timeline, progress, playPause, play, duration;
+    var self = this, poster, controls, timeline, progress, playPause, play, duration;
 
     if(this.settings.poster) {
       poster = document.createElement('div');
@@ -226,6 +256,7 @@
     this.element.appendChild(controls);
     this.element.appendChild(play);
 
+    this.elControls  = controls;
     this.elPlay      = play;
     this.elPlayPause = playPause;
     this.elProgress  = progress;
@@ -233,16 +264,15 @@
   };
 
 
-  stVideo.prototype.addEventListeners = function() {
-		var self = this, tempEvent;
+  stVideo.prototype.addVideoListeners = function() {
+    var self = this, tempEvent;
 
-    this.allowedEvents = ['canplay', 'canplaythrough', 'play', 'playing', 'pause', 'ended', 'abort', 'error', 'timeupdate'];
-    this.eventsUserCollection = [];
-    this.eventsVideoCollection = [];
-    this.eventsControlsCollection = [];
+    this.video.addEventListener('loadedmetadata', tempEvent = function() {
+      self.videoAudio(this);
+    });
+    self.eventsVideoCollection.push(tempEvent);
 
-
-		this.video.addEventListener('canplay', tempEvent = function() {
+    this.video.addEventListener('canplaythrough', tempEvent = function() {
 			if(self.useCanvas) {
 				self.canvasDrawFrame();
 			}
@@ -280,13 +310,26 @@
 		});
     self.eventsVideoCollection.push(tempEvent);
 
+    this.video.addEventListener('volumechange', tempEvent = function() {
+			if(this.volume > 0) {
+        self.changeState('muted', false);
+      } else {
+        self.changeState('muted', true);
+      }
+		});
+    self.eventsVideoCollection.push(tempEvent);
+
     this.video.addEventListener('error', tempEvent = function(ev) {
       self.isError = true;
 
 			self.error.custom(ev);
 		});
     self.eventsVideoCollection.push(tempEvent);
+  };
 
+
+  stVideo.prototype.addControlsListeners = function(controlsBox) {
+    var self = this, tempEvent;
 
     this.elPlay.addEventListener('click', tempEvent = function() {
 			if(!self.isPlaying) {
@@ -306,7 +349,14 @@
       }
 		});
     self.eventsControlsCollection.push(tempEvent);
-	};
+  };
+
+
+  /*stVideo.prototype.addEventListeners = function() {
+		var self = this, tempEvent;
+
+    this.allowedEvents = ['canplay', 'canplaythrough', 'play', 'playing', 'pause', 'ended', 'abort', 'error', 'timeupdate'];
+	};*/
 
 
   stVideo.prototype.canvasControl = function(action) {
@@ -363,7 +413,7 @@
   stVideo.prototype.progressUpdate = function() {
     var current   = this.video.currentTime,
         duration  = this.video.duration,
-        progress  = (current / duration).toFixed(2);
+        progress  = (current / duration).toFixed(4);
 
     this.elProgress.style.width = (+progress*100)+'%';
 
@@ -477,6 +527,16 @@
         ec.add(this.classNames.isEnded);
       } else {
         ec.remove(this.classNames.isEnded);
+      }
+    }
+
+    if(action == 'muted') {
+      this.isMuted = value;
+
+      if(value) {
+        ec.add(this.classNames.isMuted);
+      } else {
+        ec.remove(this.classNames.isMuted);
       }
     }
   };

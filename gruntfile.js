@@ -45,8 +45,8 @@ module.exports = function(grunt){
 				banner: '<%= copyright %>'
 			},
 			dist: {
-				src: ['<%= paths.src %>/js/stVideo.js'],
-				dest: '<%= paths.dist %>/js/stVideo.js'
+				src: ['<%= paths.src %>/js/stvideo.js'],
+				dest: '<%= paths.dist %>/js/stvideo.js'
 			}
 		},
 
@@ -67,7 +67,7 @@ module.exports = function(grunt){
 					sourceMap: true,
 				},
 				files: [{
-					'<%= paths.dist %>/js/stVideo.min.js': ['<%= paths.dist %>/js/stVideo.js']
+					'<%= paths.dist %>/js/stvideo.min.js': ['<%= paths.dist %>/js/stvideo.js']
 				}],
 			}
 		},
@@ -78,6 +78,12 @@ module.exports = function(grunt){
 					'<%= paths.src %>/js/**/*.js',
 				],
 				tasks: ['buildjs']
+			},
+			css: {
+				files: [
+					'<%= paths.src %>/css/**',
+				],
+				tasks: ['copy']
 			}
 		}
 	});
