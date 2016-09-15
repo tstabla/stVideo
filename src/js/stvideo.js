@@ -48,7 +48,7 @@
 		this.element = document.querySelector(el);
 
     this.defaults = {
-      force: 'canvas', //video | canvas
+      force: '', //video | canvas
       framesPerSecond: 30,
       volume: 1
     };

@@ -22,12 +22,15 @@ Or create new object with params, if you not added them to HTML element.
 
 ```javascript
 var video = new stVideo('#player', {
-			'mp4'   : 'filename.mp4', //recommended
-			'webm'  : 'filename.webm', //recommended
-			'ogg'   : 'filename.ogg',
-			'width' : 524,  //required
-			'height': 270   //required
-		});
+  "mp4"   : "filename.mp4",  //recommended
+  "webm"  : "filename.webm",  //recommended
+  "ogg"   : "filename.ogg",
+  "width" : 524,  //required
+  "height": 270,  //required
+  "force" : "",  //'video' or 'canvas',
+  "framesPerSecond": 30,  //needed for canvas refresh, default 30 
+  "volume": 1  //default
+});
 ```
 
 Look at the table below, and best use .mp4 and .webm video files format.
@@ -50,3 +53,6 @@ video.on('canplaythrough', function() {
 	video.play();
 });
 ```
+
+##Events
+
