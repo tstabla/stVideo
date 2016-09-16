@@ -54,5 +54,33 @@ video.on('canplaythrough', function() {
 });
 ```
 
+You can attach other events from list http://www.w3.org/TR/html5/embedded-content-0.html#mediaevents but some of them may not work properly with canvas video for ex. "volumechange".
+
+Examples:
+
+```javascript
+video.on('play', function() {
+    console.log('play');
+});
+
+video.on('pause', function() {
+    console.log('pause');
+});
+
+video.on('end', function() {
+    console.log('end');
+});
+```
+
 ##Events
+
+```javascript
+video.play(); //play video
+
+video.pause(); //pause video
+
+video.on('name', function(){}); //for attach event
+
+video.destroy(); //not working - future function for remove player
+```
 

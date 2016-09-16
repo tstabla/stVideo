@@ -7,7 +7,7 @@
  * 
  * Any and all use of this script must be accompanied by this copyright/license notice in its present form. 
  * 
- * Version: 0.8.0
+ * Version: 0.9.0
  * Author: Tomasz Stabla <t.stabla@hotmail.com> (http://stabla.com)
  * Site: https://github.com/tstabla/stVideo/
  */
@@ -53,12 +53,17 @@
 
 
 	var stVideo = function(el, settings) {
-		this.useCanvas = (/iPhone|iPad|iPod/i.test(navigator.userAgent));
+    var ios = (/iPhone|iPad|iPod/i.test(navigator.userAgent));
+
+    this.ios = ios;
+		this.useCanvas = ios;
 
 		this.element = document.querySelector(el);
 
     this.defaults = {
-      force: ''
+      force: '', //video | canvas
+      framesPerSecond: 30,
+      volume: 1
     };
 
     this.settings = this.getSettings(settings);
@@ -71,7 +76,6 @@
       this.error.checkSettings();
 
       return;
-
     }
 
     if(this.settings.force === 'video') {
@@ -129,7 +133,7 @@
 
 
 	stVideo.prototype.initPlayer = function() {
-		var format, wrapper, video, videoSource, type, canvas, context;
+		var format, wrapper, video, videoSource, type, canvas, canvasContext;
 
     this.element.classList.add(this.classNames.init);
 
@@ -159,14 +163,14 @@
 			canvas.setAttribute('width', this.settings.width);
 			canvas.setAttribute('height', this.settings.height);
 
-			context = canvas.getContext("2d");
+			canvasContext = canvas.getContext("2d");
 
-			context.fillStyle = '#ffffff';
-			context.fillRect(0, 0, this.settings.width, this.settings.height);
+			canvasContext.fillStyle = '#ffffff';
+			canvasContext.fillRect(0, 0, this.settings.width, this.settings.height);
 
-			context.drawImage(video , 0, 0, this.settings.width, this.settings.height);
+			canvasContext.drawImage(video , 0, 0, this.settings.width, this.settings.height);
 
-			this.canvasContext = context;
+			this.canvasContext = canvasContext;
 
 			wrapper.appendChild(canvas);
 		} else {
@@ -220,15 +224,40 @@
 
       this.elVolume.addEventListener('click', tempEvent = function() {
         if(self.isMuted) {
-          self.video.volume = 1;
+          self.video.volume = self.settings.volume;
+
+          if(self.audio) {
+            self.audio.volume = self.settings.volume;
+
+            self.audio.currentTime = self.video.currentTime;
+
+            if(self.isPlaying) {
+              self.audio.play();
+            }
+
+            if(self.ios) {
+              self.changeState('muted', false);
+            }
+          }
         } else {
-          self.video.volume = 0;
+          self.video.volume = 0.01;
+
+          if(self.audio) {
+            self.audio.volume = 0.01; //hmm doesn't work on iPhone
+            self.audio.pause();
+
+            if(self.ios) {
+              self.changeState('muted', true);
+            }
+          }
         }
   		});
       this.eventsControlsCollection.push(tempEvent);
     } else {
       this.hasAudio = false;
     }
+
+    return this.hasAudio;
   };
 
 
@@ -281,7 +310,11 @@
     var self = this, tempEvent;
 
     this.video.addEventListener('loadedmetadata', tempEvent = function() {
-      self.videoAudio(this);
+      var audio = self.videoAudio(this);
+
+      if(self.useCanvas && audio) {
+        self.canvasAudio();
+      }
     });
     self.eventsVideoCollection.push(tempEvent);
 
@@ -324,7 +357,7 @@
     self.eventsVideoCollection.push(tempEvent);
 
     this.video.addEventListener('volumechange', tempEvent = function() {
-			if(this.volume > 0) {
+			if(this.volume > 0.01) {
         self.changeState('muted', false);
       } else {
         self.changeState('muted', true);
@@ -365,12 +398,13 @@
   };
 
 
-  /*stVideo.prototype.addEventListeners = function() {
-		var self = this, tempEvent;
+  stVideo.prototype.canvasAudio = function() {
+    var self = this, tempEvent;
 
-    this.allowedEvents = ['canplay', 'canplaythrough', 'play', 'playing', 'pause', 'ended', 'abort', 'error', 'timeupdate'];
-	};*/
-
+    this.audio = document.createElement('audio');
+		this.audio.innerHTML = this.video.innerHTML;
+    this.audio.load();
+  };
 
   stVideo.prototype.canvasControl = function(action) {
     if(action == 'play' || (action == 'play' && this.isEnded)) {
@@ -379,7 +413,15 @@
 
         this.video.currentTime = 0;
 
+        if(this.audio) {
+          this.audio.currentTime = 0;
+        }
+
         this.lastTime = Date.now();
+      }
+
+      if(this.audio && this.isMuted !== true) {
+        this.audio.play();
       }
 
       this.changeState('play', true);
@@ -393,6 +435,10 @@
         this.changeState('pause', true);
       }
 
+      if(this.audio) {
+        this.audio.pause();
+      }
+
       this.changeState('play', false);
 
       root.cancelAnimationFrame(this.animationFrame);
@@ -404,13 +450,19 @@
 		var time = Date.now(),
 			elapsed = (time - (this.lastTime || time)) / 1000;
 
-		if(!elapsed || elapsed >= 1 / 25) {
+		if(!elapsed || elapsed >= 1 / this.settings.framesPerSecond) {
 			this.video.currentTime = this.video.currentTime + elapsed;
+
+      /*if(this.audio && Math.abs(this.audio.currentTime - this.video.currentTime) > 0.3){
+        this.audio.pause();
+  			this.audio.currentTime = this.video.currentTime;
+        this.audio.play();
+  		}*/
 
 			this.lastTime = time;
 		}
 
-    if (this.video.currentTime >= this.video.duration) {
+    if(this.video.currentTime >= this.video.duration) {
       this.canvasControl('ended');
     } else {
       this.animationFrame = root.requestAnimationFrame(this.canvasFrameUpdate.bind(this));
@@ -474,14 +526,29 @@
 
 		var self = this, tempEvent;
 
-		if(this.allowedEvents.indexOf(name) == -1) return;
+    // this.allowedEvents = ['canplay', 'canplaythrough', 'play', 'playing', 'pause', 'ended', 'abort', 'error', 'timeupdate'];
 
-		this.video.addEventListener(name, tempEvent = function() {
+		// if(this.allowedEvents.indexOf(name) == -1) return;
+
+		this.video.addEventListener(name, tempEvent = function () {
 			callback.call(this);
 		});
 
+    tempEvent.fnName = name;
+
 		self.eventsUserCollection.push(tempEvent);
 	};
+
+
+  stVideo.prototype.eventCallback = function(name) {
+    if(this.useCanvas) {
+      for(var k in this.eventsUserCollection) {
+        if(this.eventsUserCollection[k].fnName === name) {
+          this.eventsUserCollection[k]();
+        }
+      }
+    }
+  };
 
 
 	stVideo.prototype.play = function() {
@@ -518,6 +585,8 @@
 
       if(value) {
         ec.add(this.classNames.isPlaying);
+
+        this.eventCallback('play');
       } else {
         ec.remove(this.classNames.isPlaying);
       }
@@ -528,6 +597,8 @@
 
       if(value) {
         ec.add(this.classNames.isPaused);
+
+        this.eventCallback('pause');
       } else {
         ec.remove(this.classNames.isPaused);
       }
@@ -538,6 +609,8 @@
 
       if(value) {
         ec.add(this.classNames.isEnded);
+
+        this.eventCallback('end');
       } else {
         ec.remove(this.classNames.isEnded);
       }
@@ -548,6 +621,8 @@
 
       if(value) {
         ec.add(this.classNames.isMuted);
+
+        this.eventCallback('muted');
       } else {
         ec.remove(this.classNames.isMuted);
       }
