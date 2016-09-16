@@ -1,6 +1,6 @@
 {
   "name": "stVideo",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "HTML5 video canvas player. Prevents video fullscreen on iPhone/iPad.",
   "author": {
     "name": "Tomasz Stabla",

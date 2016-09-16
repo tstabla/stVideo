@@ -1,0 +1,86 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f5f7f7;
+}
+
+.header {
+  text-align: center;
+  margin: 0;
+  width: 100%;
+  position: relative;
+  background: #fff;
+  border-bottom: 1px solid #1abc9c;
+  box-shadow: 0 1px 0 0 #fff;
+  box-sizing: border-box;
+}
+
+.header__align {
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+  max-width: 960px;
+  height: 50px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.header__logo {
+  margin-top: 12px;
+  float: left;
+  width: 122px;
+  overflow: hidden;
+}
+
+.header__logo img {
+  display: block;
+  max-width: 100%;
+}
+
+.header__github {
+  text-indent: -9999px;
+  margin-top: 13px;
+  float: right;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  background: url(../img/mark-github.svg) no-repeat;
+  -webkit-background-size: 100% auto;
+  background-size: 100% auto;
+}
+
+.title {
+  font-size: 24px;
+  line-height: 22px;
+  font-family: Georgia,"Nimbus Roman No9 L",serif;
+  font-weight: 600;
+  color: #151d27;
+  text-align: center;
+  margin: 34px 0 0;
+}
+
+.title small {
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: uppercase;
+  margin-top: 10px;
+  display: block;
+}
+
+.entry, .footer {
+  margin: 24px auto 0;
+  padding: 5px;
+  max-width: 542px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 4px solid #ecf0f1;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.footer iframe {
+  display: block;
+}

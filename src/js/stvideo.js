@@ -48,7 +48,7 @@
 		this.element = document.querySelector(el);
 
     this.defaults = {
-      force: 'canvas', //video | canvas
+      force: '', //video | canvas
       framesPerSecond: 30,
       volume: 1
     };
@@ -385,13 +385,6 @@
   };
 
 
-  /*stVideo.prototype.addEventListeners = function() {
-		var self = this, tempEvent;
-
-    this.allowedEvents = ['canplay', 'canplaythrough', 'play', 'playing', 'pause', 'ended', 'abort', 'error', 'timeupdate'];
-	};*/
-
-
   stVideo.prototype.canvasAudio = function() {
     var self = this, tempEvent;
 
@@ -520,14 +513,29 @@
 
 		var self = this, tempEvent;
 
-		if(this.allowedEvents.indexOf(name) == -1) return;
+    // this.allowedEvents = ['canplay', 'canplaythrough', 'play', 'playing', 'pause', 'ended', 'abort', 'error', 'timeupdate'];
 
-		this.video.addEventListener(name, tempEvent = function() {
+		// if(this.allowedEvents.indexOf(name) == -1) return;
+
+		this.video.addEventListener(name, tempEvent = function () {
 			callback.call(this);
 		});
 
+    tempEvent.fnName = name;
+
 		self.eventsUserCollection.push(tempEvent);
 	};
+
+
+  stVideo.prototype.eventCallback = function(name) {
+    if(this.useCanvas) {
+      for(var k in this.eventsUserCollection) {
+        if(this.eventsUserCollection[k].fnName === name) {
+          this.eventsUserCollection[k]();
+        }
+      }
+    }
+  };
 
 
 	stVideo.prototype.play = function() {
@@ -564,6 +572,8 @@
 
       if(value) {
         ec.add(this.classNames.isPlaying);
+
+        this.eventCallback('play');
       } else {
         ec.remove(this.classNames.isPlaying);
       }
@@ -574,6 +584,8 @@
 
       if(value) {
         ec.add(this.classNames.isPaused);
+
+        this.eventCallback('pause');
       } else {
         ec.remove(this.classNames.isPaused);
       }
@@ -584,6 +596,8 @@
 
       if(value) {
         ec.add(this.classNames.isEnded);
+
+        this.eventCallback('end');
       } else {
         ec.remove(this.classNames.isEnded);
       }
@@ -594,6 +608,8 @@
 
       if(value) {
         ec.add(this.classNames.isMuted);
+
+        this.eventCallback('muted');
       } else {
         ec.remove(this.classNames.isMuted);
       }
