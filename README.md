@@ -28,7 +28,7 @@ var video = new stVideo('#player', {
   "width" : 524,  //required
   "height": 270,  //required
   "force" : "",  //'video' or 'canvas',
-  "framesPerSecond": 30,  //needed for canvas refresh, default 30
+  "framesPerSecond": 30,  //needed for canvas refresh, default 30 
   "volume": 1  //default
 });
 ```
