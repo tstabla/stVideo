@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<title>stViedo</title>
+
+	<link rel="stylesheet" href="dist/css/stvideo.css">
+
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+	<header class="header">
+		<div class="header__align">
+			<a class="header__logo" href="http://stabla.com"><img src="assets/img/logo-stabla@2x.png" alt="stabla.com"></a>
+
+			<a class="header__github" href="https://github.com/tstabla">Follow @tstabla</a>
+		</div>
+	</header>
+
+	<h1 class="title">
+		stVideo
+		<small>HTML5 video canvas player</small>
+	</h1>
+
+	<section class="entry">
+		<div id="player" data-stvideo="{'mp4': 'assets/video/car.mp4', 'webm': 'assets/video/car.webm', 'width': 524, 'height': 270}"></div>
+	</section>
+
+	<script src="dist/js/stvideo.js"></script>
+
+	<script>
+		var video = new stVideo('#player');
+
+		video.on('canplaythrough', function() {
+			console.log('start');
+			// video.play();
+		});
+
+		video.on('play', function() {
+			console.log('play');
+		});
+
+		video.on('pause', function() {
+			console.log('pause');
+		});
+
+		video.on('end', function() {
+			console.log('end');
+		});
+	</script>
+
+</body>
+</html>

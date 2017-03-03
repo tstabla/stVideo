@@ -1,0 +1,6 @@
+/node_modules
+/__stuff
+*.DS_Store
+
+/assets
+/index.html
