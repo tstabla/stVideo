@@ -377,12 +377,6 @@
     this.elProgress  = progress;
     this.elHandle    = handle;
     this.elDuration  = duration;
-
-    setTimeout( function() {
-      self.resizeHandler( function() {
-        self.timelineSettings.wrapperWidth = self.elTimeline.offsetWidth;
-      } );
-    }, 100 );
   };
 
   stVideo.prototype.addVideoListeners = function() {
@@ -403,6 +397,12 @@
       }
 
       self.progressUpdate();
+
+      setTimeout( function() {
+        self.resizeHandler( function() {
+          self.timelineSettings.wrapperWidth = self.elTimeline.offsetWidth;
+        } );
+      }, 100 );
     } );
     self.eventsVideoCollection.push( tempEvent );
 
@@ -528,7 +528,7 @@
 
           self.moveHandle( 0, true );
 
-          self.changeState('handle', false);
+          self.changeState( 'handle', false );
 
           self.timelineSettings.isHandleMoving = false;
         }
