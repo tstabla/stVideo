@@ -50,7 +50,11 @@
 
     this.useTouch = !!( 'ontouchstart' in window ) || !!( 'ontouchstart' in document.documentElement ) || !!window.ontouchstart || !!window.onmsgesturechange || ( window.DocumentTouch && window.document instanceof window.DocumentTouch );
 
-    this.element = document.querySelector( el );
+    if ( typeof el === 'object' ) {
+      this.element = el;
+    } else {
+      this.element = document.querySelector( el );
+    }
 
     this.defaults = {
       force           : '', // video | canvas

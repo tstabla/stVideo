@@ -1,12 +1,12 @@
 /*! 
- * stVideo
+ * stVideo 
  * HTML5 video canvas player. Prevents video fullscreen on iPhone/iPad.
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- *
- * Any and all use of this script must be accompanied by this copyright/license notice in its present form.
- *
+ * 
+ * Licensed under the MIT license: 
+ * http://www.opensource.org/licenses/mit-license.php 
+ * 
+ * Any and all use of this script must be accompanied by this copyright/license notice in its present form. 
+ * 
  * Version: 0.9.0
  * Author: Tomasz Stabla <t.stabla@hotmail.com> (http://stabla.com)
  * Site: https://github.com/tstabla/stVideo/
@@ -63,7 +63,11 @@
 
     this.useTouch = !!( 'ontouchstart' in window ) || !!( 'ontouchstart' in document.documentElement ) || !!window.ontouchstart || !!window.onmsgesturechange || ( window.DocumentTouch && window.document instanceof window.DocumentTouch );
 
-    this.element = document.querySelector( el );
+    if ( typeof el === 'object' ) {
+      this.element = el;
+    } else {
+      this.element = document.querySelector( el );
+    }
 
     this.defaults = {
       force           : '', // video | canvas
