@@ -44,7 +44,13 @@
   var stVideo = function( el, settings ) {
     this.iOS = ( /iPhone|iPad|iPod/i.test( navigator.userAgent ) );
 
-    this.useCanvas = this.iOS;
+    this.iOSv = parseFloat(	( '' + ( /CPU.*OS ([0-9_]{1,5})|(CPU like).*AppleWebKit.*Mobile/i.exec( navigator.userAgent ) || [ 0, '' ] )[ 1 ] ).replace( '_', '.' ).replace( '_', '' ) ) || false;
+
+    if ( this.iOS && this.iOSv < 10 ) {
+      this.useCanvas = true;
+    } else {
+      this.useCanvas = false;
+    }
 
     this.isMobile = navigator.userAgent.match( /Android|AvantGo|BlackBerry|DoCoMo|Fennec|iPod|iPhone|iPad|J2ME|MIDP|NetFront|Nokia|Opera Mini|Opera Mobi|PalmOS|PalmSource|portalmmm|Plucker|ReqwirelessWeb|SonyEricsson|Symbian|UP\\.Browser|webOS|Windows CE|Windows Phone OS|Xiino/i );
 
@@ -168,6 +174,10 @@
     video = document.createElement( 'video' );
     video.setAttribute( 'width', this.settings.width );
     video.setAttribute( 'height', this.settings.height );
+
+    if ( this.iOS && this.iOSv >= 10 ) {
+      video.setAttribute( 'playsinline', '' );
+    }
 
     format = this.supportedVideoFormat( video );
 
